@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Source } from "@/lib/types";
 
 export function riskBand(score: number) {
@@ -47,8 +47,9 @@ export function SectionTitle({ children, aside }: { children: ReactNode; aside?:
 }
 
 export function SourceChips({ ids, sources, max = 8 }: { ids: string[]; sources: Map<string, Source>; max?: number }) {
+  const [expanded, setExpanded] = useState(false);
   if (!ids.length) return null;
-  const shown = ids.slice(0, max);
+  const shown = expanded ? ids : ids.slice(0, max);
   return (
     <span className="inline-flex flex-wrap gap-1 align-middle">
       {shown.map((id) => {
@@ -67,7 +68,21 @@ export function SourceChips({ ids, sources, max = 8 }: { ids: string[]; sources:
           </a>
         );
       })}
-      {ids.length > max && <span className="text-[10px] text-slate-400">+{ids.length - max}</span>}
+      {ids.length > max && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setExpanded((x) => !x);
+          }}
+          aria-expanded={expanded}
+          title={expanded ? "Show fewer sources" : `Show ${ids.length - max} more sources`}
+          className="rounded bg-indigo-50 px-1.5 py-px text-[10px] font-medium text-indigo-700 hover:bg-indigo-100"
+        >
+          {expanded ? "less" : `+${ids.length - max} more`}
+        </button>
+      )}
     </span>
   );
 }
